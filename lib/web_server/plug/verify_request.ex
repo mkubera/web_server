@@ -4,7 +4,7 @@ defmodule WebServer.Plug.VerifyRequest do
     Error raised when a required field is missing.
     """
 
-    defexception message: ""
+    defexception message: "", plug_status: 400
   end
 
   def init(options), do: options
@@ -17,7 +17,7 @@ defmodule WebServer.Plug.VerifyRequest do
   defp verify_request!(params, fields) do
     verified =
       params
-      |> Maps.keys()
+      |> Map.keys()
       |> contains_fields?(fields)
 
     unless verified, do: raise(IncompleteRequestError)

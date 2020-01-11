@@ -10,7 +10,7 @@ defmodule WebServer.Application do
     children = [
       # Starts a worker by calling: WebServer.Worker.start_link(arg)
       # {WebServer.Worker, arg}
-      {Plug.Cowboy, scheme: :http, plug: WebServer.Router, options: [port: 8080]}
+      {Plug.Cowboy, scheme: :http, plug: WebServer.Router, options: [port: cowboy_port()]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -20,5 +20,9 @@ defmodule WebServer.Application do
     Logger.info("Starting application...")
 
     Supervisor.start_link(children, opts)
+  end
+
+  defp cowboy_port do
+    Application.get_env(:web_server, :cowboy_port, 8080)
   end
 end
