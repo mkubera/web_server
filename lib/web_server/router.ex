@@ -4,8 +4,14 @@ defmodule WebServer.Router do
 
   alias WebServer.Plug.VerifyRequest
 
+  if Mix.env == :dev, do: use Plug.Debugger
+
   plug Plug.Parsers, parsers: [:urlencoded, :multipart]
   plug VerifyRequest, fields: ["content", "mimetype"], paths: ["/upload"]
+  plug Plug.Parsers,
+    parsers: [:urlencoded, :json],
+    pass: ["text/*", "application/*"],
+    json_decoder: Jason
   plug(:match)
   plug(:dispatch)
 
@@ -14,7 +20,11 @@ defmodule WebServer.Router do
   end
 
   get "/upload" do
-  	send_resp conn, 201, "Uploaded"
+    IO.inspect conn
+    conn
+    |> put_resp_content_type("application/json")
+  	|> send_resp(201, Jason.encode!(conn.params))
+    # send_resp(conn, 201, "Uploaded")
   end
 
   match _ do
